@@ -32,7 +32,7 @@ class SiteHostPurgeCache implements Flushable
             return;
         }
         $outcome = SiteHostPurgeCache::create($apiKey, $clientId, $server, $name)->purgeCache($server, $name);
-        DB::alteration_message("SiteHost cache purge: " . ($outcome['status'] ? 'Success' : 'Failure') . " - " . $outcome['msg'], $outcome['status'] ? 'good' : 'bad');
+        DB::alteration_message("SiteHost cache purge: " . ($outcome['status']) . " - " . $outcome['msg'], $outcome['status'] ? 'good' : 'bad');
     }
 
     private const BASE_URL = 'https://api.sitehost.nz/1.5';

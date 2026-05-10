@@ -28,12 +28,14 @@ class SitehostPurgeCache implements Flushable
         $clientId = (int) (Config::inst()->get(SitehostPurgeCache::class, 'client_id') ?: Environment::getEnv('SS_SITEHOST_CLIENT_ID'));
         $server = (string) (Config::inst()->get(SitehostPurgeCache::class, 'server') ?: Environment::getEnv('SS_SITEHOST_SERVER'));
         $name = (string) (Config::inst()->get(SitehostPurgeCache::class, 'name') ?: Environment::getEnv('SS_SITEHOST_NAME'));
-        if (!$apiKey || !$clientId || !$server || !$name) {
-            user_error('SitehostPurgeCache::flush() missing configuration: apiKey, clientId, server, and name are required', E_USER_NOTICE);
-            return;
+        if ($apiKey || $clientId || $server || $name) {
+            if ($apiKey && $clientId && $server && $name) {
+                $outcome = SitehostPurgeCache::create($apiKey, $clientId, $server, $name)->purgeCache($server, $name);
+                DB::alteration_message("Sitehost cache purge: " . ($outcome['status'] ?? 'ERROR: NO STATUS') . " - " . ($outcome['msg'] ?? 'NO MESSAGE'), $outcome['status'] ? 'good' : 'bad');
+            } else {
+                user_error('SitehostPurgeCache::flush() missing configuration: apiKey, clientId, server, and name are required', E_USER_NOTICE);
+            }
         }
-        $outcome = SitehostPurgeCache::create($apiKey, $clientId, $server, $name)->purgeCache($server, $name);
-        DB::alteration_message("Sitehost cache purge: " . ($outcome['status'] ?? 'ERROR: NO STATUS') . " - " . ($outcome['msg'] ?? 'NO MESSAGE'), $outcome['status'] ? 'good' : 'bad');
     }
 
     private const BASE_URL = 'https://api.sitehost.nz/1.5';

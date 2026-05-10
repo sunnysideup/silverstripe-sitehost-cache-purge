@@ -16,7 +16,7 @@ use Sunnysideup\SitehostCachePurge\Api\SitehostPurgeCache;
  */
 class SitehostWriteExtension extends Extension
 {
-    public function onAfterPublish()
+    public function onAfterWrite()
     {
         SitehostPurgeCache::create()->purgeCache();
     }

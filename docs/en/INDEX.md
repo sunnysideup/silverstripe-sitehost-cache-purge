@@ -27,6 +27,10 @@
     Note you can also set these values using the yml configuration:
 
     ```yml
+    ---
+    Name: sitehost-cache-purge-config
+    After: 'framework'
+    ---    
     Sunnysideup\SitehostCachePurge\Api\SitehostPurgeCache:
       api_key: foo
       client_id: 123
@@ -46,8 +50,7 @@
     Name: sitehost-cache-purge-dataobjects
     After: 'framework'
     ---
-
     MyDataObject:
-    extensions:
-    - Sunnysideup\SitehostCachePurge\Extensions\SitehostWriteExtension
+      extensions:
+        - Sunnysideup\SitehostCachePurge\Extensions\SitehostWriteExtension
    ```

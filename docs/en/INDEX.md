@@ -24,6 +24,16 @@
     SS_SITEHOST_NAME="foobar" # see: 
     ```
 
+    Note you can also set these values using the yml configuration:
+
+    ```yml
+    Sunnysideup\SitehostCachePurge\Api\SitehostPurgeCache:
+      api_key: foo
+      client_id: 123
+      server_id: bar
+      name_id: foobar
+    ```
+
 2. to clear/purge the cache, run `/dev/?flush=all`
 
 3. everytime you save **publish** a page, the cache will be cleared/purged.

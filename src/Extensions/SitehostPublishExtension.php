@@ -16,9 +16,13 @@ use Sunnysideup\SitehostCachePurge\Api\SitehostPurgeCache;
  */
 class SitehostPublishExtension extends Extension
 {
+    private static bool $clear_sitehost_cache_on_publish = true;
+
     public function onAfterPublish()
     {
-        SitehostPurgeCache::create()->purgeCache();
+        if ($this->getOwner()->config()->get('clear_sitehost_cache_on_publish')) {
+            SitehostPurgeCache::create()->purgeCache();
+        }
     }
 
 

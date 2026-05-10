@@ -1,0 +1,52 @@
+{
+  "name": "sunnysideup/sitehost-cache-purge",
+  "description": "Hooks a silverstripe install to the Sitehost Cache to Purge it",
+  "type": "silverstripe-vendormodule",
+  "keywords": [
+    "sitehost",
+    "cache",
+    "caching",
+    "purge",
+    "cdn",
+    "clear cache",
+    "speed",
+    "optimised",
+    "best hosting company in the world"
+  ],
+  "license": "BSD-3-Clause",
+  "require": {
+    "silverstripe/framework": "^5.0",
+    "silverstripe/admin": "^2.0"
+  },
+  "require-dev": {
+    "sunnysideup/sswebpack_engine_only": "5.x-dev",
+    "silverleague/ideannotator": "*",
+    "phpunit/phpunit": "^9.6",
+    "squizlabs/php_codesniffer": "^3.7",
+    "silverstripe/standards": "^1",
+    "phpstan/extension-installer": "^1.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "Sunnysideup\\SitehostCachePurge\\": "src/"
+    }
+  },
+  "extra": {
+    "expose": [
+      "client/dist"
+    ]
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "bin": [
+    "bin/sake-npm-build-sitehost-cache-purge.sh",
+    "bin/sake-npm-watch-sitehost-cache-purge.sh"
+  ],
+  "authors": [
+    {
+      "name": "Nicolaas Thiemen Francken",
+      "email": "modules@sunnysideup.co.nz",
+      "role": "lead developer"
+    }
+  ]
+}

@@ -26,8 +26,8 @@ class SiteHostApi
     {
         $this->apiKey   = (string) ($apiKey ?? $this->config()->get('apiKey') ?: Environment::getEnv('SS_SITEHOST_API_KEY'));
         $this->clientId = (int) ($clientId ?? $this->config()->get('clientId') ?: Environment::getEnv('SS_SITEHOST_CLIENT_ID'));
-        $this->server   = (int) ($server ?? $this->config()->get('server') ?: Environment::getEnv('SS_SITEHOST_SERVER'));
-        $this->name     = (int) ($name ?? $this->config()->get('name') ?: Environment::getEnv('SS_SITEHOST_NAME'));
+        $this->server   = (string) ($server ?? $this->config()->get('server') ?: Environment::getEnv('SS_SITEHOST_SERVER'));
+        $this->name     = (string) ($name ?? $this->config()->get('name') ?: Environment::getEnv('SS_SITEHOST_NAME'));
     }
 
     /**

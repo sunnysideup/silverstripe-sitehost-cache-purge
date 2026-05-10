@@ -8,3 +8,6 @@ SS_SITEHOST_CLIENT_ID=123
 SS_SITEHOST_SERVER="bar"
 SS_SITEHOST_NAME="foobar"
 ```
+
+2. to clear the cache, run `/dev/?flush=all`
+

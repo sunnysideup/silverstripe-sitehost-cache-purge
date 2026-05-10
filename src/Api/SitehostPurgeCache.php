@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Sunnysideup\SitehostCachePurge\Api;
 
+use RuntimeException;
+use SilverStripe\Control\Director;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Environment;
@@ -24,17 +26,14 @@ class SitehostPurgeCache implements Flushable
     use Configurable;
     public static function flush()
     {
-        $apiKey = (string) (Config::inst()->get(SitehostPurgeCache::class, 'api_key') ?: Environment::getEnv('SS_SITEHOST_API_KEY'));
-        $clientId = (int) (Config::inst()->get(SitehostPurgeCache::class, 'client_id') ?: Environment::getEnv('SS_SITEHOST_CLIENT_ID'));
-        $server = (string) (Config::inst()->get(SitehostPurgeCache::class, 'server') ?: Environment::getEnv('SS_SITEHOST_SERVER'));
-        $name = (string) (Config::inst()->get(SitehostPurgeCache::class, 'name') ?: Environment::getEnv('SS_SITEHOST_NAME'));
-        if ($apiKey || $clientId || $server || $name) {
-            if ($apiKey && $clientId && $server && $name) {
-                $outcome = SitehostPurgeCache::create($apiKey, $clientId, $server, $name)->purgeCache($server, $name);
-                DB::alteration_message("Sitehost cache purge: " . ($outcome['status'] ?? 'ERROR: NO STATUS') . " - " . ($outcome['msg'] ?? 'NO MESSAGE'), $outcome['status'] ? 'good' : 'bad');
-            } else {
-                user_error('SitehostPurgeCache::flush() missing configuration: apiKey, clientId, server, and name are required', E_USER_NOTICE);
-            }
+        $outcome = SitehostPurgeCache::create()->purgeCache();
+        if (Director::is_cli()) {
+            DB::alteration_message(
+                "Sitehost cache purge: " .
+                ($outcome['status'] ?? 'ERROR: NO STATUS') . " - " .
+                ($outcome['msg'] ?? 'NO MESSAGE'),
+                $outcome['status'] ? 'created' : 'deleted'
+            );
         }
     }
 
@@ -53,8 +52,8 @@ class SitehostPurgeCache implements Flushable
 
     public function __construct(?string $apiKey = null, ?int $clientId = null)
     {
-        $this->apiKey   = (string) ($apiKey ?? $this->config()->get('api_key') ?: Environment::getEnv('SS_SITEHOST_API_KEY'));
-        $this->clientId = (int) ($clientId ?? $this->config()->get('client_id') ?: Environment::getEnv('SS_SITEHOST_CLIENT_ID'));
+        $this->apiKey   = (string) ($apiKey ?: $this->config()->get('api_key') ?: Environment::getEnv('SS_SITEHOST_API_KEY'));
+        $this->clientId = (int) ($clientId ?: $this->config()->get('client_id') ?: Environment::getEnv('SS_SITEHOST_CLIENT_ID'));
     }
 
     /**
@@ -65,16 +64,23 @@ class SitehostPurgeCache implements Flushable
      * @param  string $server  The server name, e.g. "ch-servername"
      * @param  string $name    The stack/container name, e.g. "examplenz"
      * @return array           Decoded JSON response: ['status' => bool, 'msg' => string]
-     * @throws RuntimeException On cURL error or a non-200 HTTP response
+     * @throws \RuntimeException On cURL error or a non-200 HTTP response
      */
     public function purgeCache(?string $server = null, ?string $name = null): array
     {
         $this->server = (string) ($server ?: $this->config()->get('server_id') ?: Environment::getEnv('SS_SITEHOST_SERVER'));
         $this->name = (string) ($name ?: $this->config()->get('name_id') ?: Environment::getEnv('SS_SITEHOST_NAME'));
-        return $this->post('/cloud/stack/purge_cache.json', [
-            'server' => $this->server ?: $server,
-            'name'   => $this->name ?: $name,
-        ]);
+        if ($this->isReadyToPurge()) {
+            return $this->post('/cloud/stack/purge_cache.json', [
+                'server' => $this->server ?: $server,
+                'name'   => $this->name ?: $name,
+            ]);
+        } else {
+            return [
+                'status' => false,
+                'msg' => 'SitehostPurgeCache::purgeCache() missing configuration: apiKey, clientId, server, and name are required',
+            ];
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -128,5 +134,17 @@ class SitehostPurgeCache implements Flushable
         }
 
         return $decoded;
+    }
+
+    protected function isReadyToPurge(): bool
+    {
+        if ($this->apiKey || $this->clientId || $this->server || $this->name) {
+            if ($this->apiKey && $this->clientId && $this->server && $this->name) {
+                return true;
+            } else {
+                user_error('SitehostPurgeCache::flush() missing some configuration: apiKey, clientId, server, and name are required', E_USER_NOTICE);
+            }
+        }
+        return false;
     }
 }

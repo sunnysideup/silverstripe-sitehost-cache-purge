@@ -1,1 +1,9 @@
 # see https://docs.silverstripe.org/en/developer_guides/configuration/configuration/
+---
+Name: sitehost-cache-purge
+After: 'framework'
+---
+
+SilverStripe\CMS\Model\SiteTree;:
+  extensions:
+    - Sunnysideup\SitehostCachePurge\Extensions\SitehostSitetreeExtension

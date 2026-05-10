@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
+namespace Sunnysideup\SitehostCachePurge\Api;
+
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Environment;
 use SilverStripe\Core\Flushable;
 use SilverStripe\Core\Injector\Injectable;
-use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DB;
 
 /**
@@ -17,22 +18,22 @@ use SilverStripe\ORM\DB;
  *
  * @see https://docs.sitehost.nz/api/v1.5/
  */
-class SiteHostPurgeCache implements Flushable
+class SitehostPurgeCache implements Flushable
 {
     use Injectable;
     use Configurable;
     public static function flush()
     {
-        $apiKey = (string) (Config::inst()->get(SiteHostPurgeCache::class, 'api_key') ?: Environment::getEnv('SS_SITEHOST_API_KEY'));
-        $clientId = (int) (Config::inst()->get(SiteHostPurgeCache::class, 'client_id') ?: Environment::getEnv('SS_SITEHOST_CLIENT_ID'));
-        $server = (string) (Config::inst()->get(SiteHostPurgeCache::class, 'server') ?: Environment::getEnv('SS_SITEHOST_SERVER'));
-        $name = (string) (Config::inst()->get(SiteHostPurgeCache::class, 'name') ?: Environment::getEnv('SS_SITEHOST_NAME'));
+        $apiKey = (string) (Config::inst()->get(SitehostPurgeCache::class, 'api_key') ?: Environment::getEnv('SS_SITEHOST_API_KEY'));
+        $clientId = (int) (Config::inst()->get(SitehostPurgeCache::class, 'client_id') ?: Environment::getEnv('SS_SITEHOST_CLIENT_ID'));
+        $server = (string) (Config::inst()->get(SitehostPurgeCache::class, 'server') ?: Environment::getEnv('SS_SITEHOST_SERVER'));
+        $name = (string) (Config::inst()->get(SitehostPurgeCache::class, 'name') ?: Environment::getEnv('SS_SITEHOST_NAME'));
         if (!$apiKey || !$clientId || !$server || !$name) {
-            user_error('SiteHostPurgeCache::flush() missing configuration: apiKey, clientId, server, and name are required', E_USER_NOTICE);
+            user_error('SitehostPurgeCache::flush() missing configuration: apiKey, clientId, server, and name are required', E_USER_NOTICE);
             return;
         }
-        $outcome = SiteHostPurgeCache::create($apiKey, $clientId, $server, $name)->purgeCache($server, $name);
-        DB::alteration_message("SiteHost cache purge: " . ($outcome['status'] ?? 'ERROR: NO STATUS') . " - " . ($outcome['msg'] ?? 'NO MESSAGE'), $outcome['status'] ? 'good' : 'bad');
+        $outcome = SitehostPurgeCache::create($apiKey, $clientId, $server, $name)->purgeCache($server, $name);
+        DB::alteration_message("Sitehost cache purge: " . ($outcome['status'] ?? 'ERROR: NO STATUS') . " - " . ($outcome['msg'] ?? 'NO MESSAGE'), $outcome['status'] ? 'good' : 'bad');
     }
 
     private const BASE_URL = 'https://api.sitehost.nz/1.5';

@@ -4,6 +4,6 @@ Name: sitehost-cache-purge
 After: 'framework'
 ---
 
-SilverStripe\CMS\Model\SiteTree;:
+SilverStripe\CMS\Model\SiteTree:
   extensions:
-    - Sunnysideup\SitehostCachePurge\Extensions\SitehostSitetreeExtension
+    - Sunnysideup\SitehostCachePurge\Extensions\SitehostWriteExtension

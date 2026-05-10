@@ -14,7 +14,7 @@ use Sunnysideup\SitehostCachePurge\Api\SitehostPurgeCache;
  *
  * @see https://docs.sitehost.nz/api/v1.5/
  */
-class SitehostSitetreeExtension extends Extension
+class SitehostWriteExtension extends Extension
 {
     public function onAfterPublish()
     {

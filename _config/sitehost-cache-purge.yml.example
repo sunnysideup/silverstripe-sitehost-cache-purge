@@ -1,1 +1,10 @@
 
+# see https://docs.silverstripe.org/en/developer_guides/configuration/configuration/
+---
+Name: sitehost-cache-purge
+After: 'framework'
+---
+
+MyDataObject:
+  extensions:
+    - Sunnysideup\SitehostCachePurge\Extensions\SitehostWriteExtension

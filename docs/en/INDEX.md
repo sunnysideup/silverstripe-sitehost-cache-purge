@@ -24,7 +24,20 @@
     SS_SITEHOST_NAME="foobar" # see: 
     ```
 
-2. to clear the cache, run `/dev/?flush=all`
+2. to clear/purge the cache, run `/dev/?flush=all`
 
-3. everytime you save **publish** a page, the cache will be cleared.
+3. everytime you save **publish** a page, the cache will be cleared/purged.
 
+4. to clear/purge the cache on other `dataobjects`, do this:
+
+   ```yml
+    # see https://docs.silverstripe.org/en/developer_guides/configuration/configuration/
+    ---
+    Name: sitehost-cache-purge-dataobjects
+    After: 'framework'
+    ---
+
+    MyDataObject:
+    extensions:
+    - Sunnysideup\SitehostCachePurge\Extensions\SitehostWriteExtension
+   ```

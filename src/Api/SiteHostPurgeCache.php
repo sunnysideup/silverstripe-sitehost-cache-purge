@@ -1,5 +1,12 @@
 <?php
 
+use SilverStripe\Core\Config\Config;
+use SilverStripe\Core\Config\Configurable;
+use SilverStripe\Core\Environment;
+use SilverStripe\Core\Flushable;
+use SilverStripe\Core\Injector\Injectable;
+use SilverStripe\Core\Injector\Injector;
+
 /**
  * SiteHost API Client
  *
@@ -7,27 +14,34 @@
  *
  * @see https://docs.sitehost.nz/api/v1.5/
  */
-class SiteHostApi
+class SiteHostPurgeCache implements Flushable
 {
     use Injectable;
     use Configurable;
+    public static function flush()
+    {
+        $apiKey = (string) (Config::inst()->get(SiteHostPurgeCache::class, 'apiKey') ?: Environment::getEnv('SS_SITEHOST_API_KEY'));
+        $clientId = (int) (Config::inst()->get(SiteHostPurgeCache::class, 'clientId') ?: Environment::getEnv('SS_SITEHOST_CLIENT_ID'));
+        $server = (string) (Config::inst()->get(SiteHostPurgeCache::class, 'server') ?: Environment::getEnv('SS_SITEHOST_SERVER'));
+        $name = (string) (Config::inst()->get(SiteHostPurgeCache::class, 'name') ?: Environment::getEnv('SS_SITEHOST_NAME'));
+        SiteHostPurgeCache::create($apiKey, $clientId, $server, $name)->purgeCache($server, $name);
+    }
 
     private const BASE_URL = 'https://api.sitehost.nz/1.5';
 
     private static string $api_key;
     private static int $client_id;
 
+
     private string $apiKey;
     private int $clientId;
     private string $server;
     private string $name;
 
-    public function __construct(?string $apiKey = null, ?int $clientId = null, ?string $server = null, ?string $name = null)
+    public function __construct(?string $apiKey = null, ?int $clientId = null)
     {
         $this->apiKey   = (string) ($apiKey ?? $this->config()->get('apiKey') ?: Environment::getEnv('SS_SITEHOST_API_KEY'));
         $this->clientId = (int) ($clientId ?? $this->config()->get('clientId') ?: Environment::getEnv('SS_SITEHOST_CLIENT_ID'));
-        $this->server   = (string) ($server ?? $this->config()->get('server') ?: Environment::getEnv('SS_SITEHOST_SERVER'));
-        $this->name     = (string) ($name ?? $this->config()->get('name') ?: Environment::getEnv('SS_SITEHOST_NAME'));
     }
 
     /**
@@ -42,6 +56,8 @@ class SiteHostApi
      */
     public function purgeCache(?string $server = null, ?string $name = null): array
     {
+        $this->server = $server ?: $this->server;
+        $this->name = $name ?: $this->name;
         return $this->post('/cloud/stack/purge_cache.json', [
             'server' => $this->server ?: $server,
             'name'   => $this->name ?: $name,

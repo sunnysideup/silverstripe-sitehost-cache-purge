@@ -26,6 +26,9 @@ class SitehostPurgeCache implements Flushable
     use Configurable;
     public static function flush()
     {
+        if (Director::isDev()) {
+            return;
+        }
         $outcome = SitehostPurgeCache::create()->purgeCache();
         if (Director::is_cli()) {
             DB::alteration_message(
